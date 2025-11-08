@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+  <h1>Categories</h1>
+
+ {%if request.user.is_staff%}
+  <p><a href="{% url 'cata_add' %}">+ Create new category</a></p>
+{%endif%}
+
+  {% if topic %}
+    <ul>
+      {% for c in topic %}
+        <li>
+          <strong>[<a href="{% url 'cata_post' c.pk %}">{{ c.name }}</a>]</strong>
+          {% if c.parent %}
+            — parent: {{ c.parent.name }}
+          {% endif %}
+          {%if request.user.is_staff%}
+            [<a href="{% url 'cata_update' c.pk %}">edit</a>]
+            [<a href="{% url 'cata_delete' c.pk %}">delete</a>]
+          {%endif%}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No categories yet.</p>
+  {% endif %}
+
+
+</body>
+</html>
