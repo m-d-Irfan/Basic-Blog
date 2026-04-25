@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ match_post.title }} — The Chronicle</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { serif: ['Playfair Display', 'serif'], sans: ['DM Sans', 'sans-serif'] },
+          colors: { navy: { 900: '#0d1b2a', 800: '#1b2a3b' } }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #faf8f4; }
+    .prose-content { font-size: 1.05rem; line-height: 1.9; color: #374151; }
+    .prose-content p { margin-bottom: 1.5rem; }
+  </style>
+</head>
+<body class="font-sans">
+
+  <!-- Top nav -->
+  <nav class="bg-navy-900 px-6 py-4 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2 text-gray-400 hover:text-amber-400 transition-colors text-sm">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <span class="font-serif text-white font-bold">The <span class="text-amber-400">Chronicle</span></span>
+    <div class="w-24"></div>
+  </nav>
+
+  <!-- Article -->
+  <article class="max-w-2xl mx-auto px-6 py-16">
+    <!-- Meta -->
+    <div class="mb-8">
+      <div class="flex items-center gap-2 mb-6">
+        <div class="h-px flex-1 bg-gray-200"></div>
+        <span class="text-xs uppercase tracking-widest text-amber-500 font-medium px-3">Article</span>
+        <div class="h-px flex-1 bg-gray-200"></div>
+      </div>
+      <h1 class="font-serif text-4xl md:text-5xl font-bold text-navy-900 leading-tight mb-6">{{ match_post.title }}</h1>
+      <div class="flex items-center gap-4 text-sm text-gray-500">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 bg-navy-900 rounded-full flex items-center justify-center">
+            <span class="text-amber-400 font-bold text-xs">{{ match_post.author.username|first|upper }}</span>
+          </div>
+          <span>{{ match_post.author.username }}</span>
+        </div>
+        <span>·</span>
+        <time>{{ match_post.created_at|date:"F j, Y" }}</time>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="flex gap-1.5 mb-10">
+      <div class="h-1 w-12 bg-amber-400 rounded-full"></div>
+      <div class="h-1 w-4 bg-gray-200 rounded-full"></div>
+      <div class="h-1 w-2 bg-gray-200 rounded-full"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="prose-content">
+      {{ match_post.content|linebreaks }}
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-16 pt-8 border-t border-gray-200 flex items-center justify-between">
+      <a href="/" class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-navy-900 transition-colors font-medium">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        All Posts
+      </a>
+      <span class="text-xs text-gray-400 uppercase tracking-widest">The Chronicle</span>
+    </div>
+  </article>
+
+</body>
+</html>

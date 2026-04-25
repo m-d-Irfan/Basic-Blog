@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delete Category — The Chronicle</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { serif: ['Playfair Display', 'serif'], sans: ['DM Sans', 'sans-serif'] },
+          colors: { navy: { 900: '#0d1b2a', 800: '#1b2a3b' } }
+        }
+      }
+    }
+  </script>
+  <style>body { background: #faf8f4; }</style>
+</head>
+<body class="font-sans">
+
+  <nav class="bg-navy-900 px-6 py-4 flex items-center justify-between">
+    <a href="{% url 'cata_list' %}" class="flex items-center gap-2 text-gray-400 hover:text-amber-400 transition-colors text-sm">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      Back to Categories
+    </a>
+    <span class="font-serif text-white font-bold">The <span class="text-amber-400">Chronicle</span></span>
+    <div class="w-28"></div>
+  </nav>
+
+  <div class="max-w-md mx-auto px-6 py-20 flex flex-col items-center text-center">
+
+    <!-- Warning icon -->
+    <div class="w-20 h-20 bg-red-50 rounded-2xl flex items-center justify-center mb-6">
+      <svg class="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+      </svg>
+    </div>
+
+    <p class="text-xs uppercase tracking-widest text-red-400 font-medium mb-3">Confirm Deletion</p>
+    <h1 class="font-serif text-3xl font-bold text-navy-900 mb-4">Delete Category</h1>
+    <p class="text-gray-500 mb-2">
+      Are you sure you want to delete
+    </p>
+    <p class="font-serif text-xl font-bold text-navy-900 mb-8">"{{ object.name }}"</p>
+    <p class="text-sm text-red-400 bg-red-50 border border-red-100 rounded-xl px-4 py-3 mb-8 w-full">
+      This action cannot be undone. Any posts in this category may be affected.
+    </p>
+
+    <form method="post" class="w-full flex flex-col gap-3">
+      {% csrf_token %}
+      <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3.5 px-6 rounded-xl transition-colors">
+        Yes, Delete Category
+      </button>
+      <a href="{% url 'cata_list' %}" class="w-full text-center border border-gray-200 text-gray-500 hover:border-gray-400 hover:text-gray-700 font-medium py-3.5 px-6 rounded-xl transition-colors text-sm">
+        Cancel
+      </a>
+    </form>
+
+  </div>
+
+</body>
+</html>

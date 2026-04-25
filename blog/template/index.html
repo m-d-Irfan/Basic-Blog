@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Blog</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['Playfair Display', 'serif'],
+            sans: ['DM Sans', 'sans-serif'],
+          },
+          colors: {
+            navy: { 900: '#0d1b2a', 800: '#1b2a3b', 700: '#243447' },
+            cream: { 50: '#faf8f4', 100: '#f3ede3' },
+            amber: { 400: '#f59e0b', 500: '#d97706' },
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #faf8f4; }
+    .sidebar-link { transition: all 0.2s; }
+    .sidebar-link:hover { padding-left: 1.5rem; color: #f59e0b; }
+    .post-card { transition: transform 0.2s, box-shadow 0.2s; }
+    .post-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(13,27,42,0.12); }
+  </style>
+</head>
+<body class="font-sans min-h-screen flex">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-navy-900 min-h-screen flex flex-col fixed left-0 top-0 z-20 hidden md:flex">
+    <div class="px-8 pt-10 pb-6 border-b border-navy-700">
+      <h1 class="font-serif text-2xl font-900 text-white leading-tight">The<br><span class="text-amber-400">Chronicle</span></h1>
+      <p class="text-xs text-gray-400 mt-2 uppercase tracking-widest">Stories Worth Reading</p>
+    </div>
+    <nav class="flex-1 px-6 pt-8 space-y-1">
+      {% if user.is_authenticated %}
+        <div class="mb-6 px-2 py-3 bg-navy-800 rounded-lg">
+          <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Signed in as</p>
+          <p class="text-amber-400 font-medium text-sm">{{ user.username }}</p>
+        </div>
+        <a href="{% url 'add_post' %}" class="sidebar-link flex items-center gap-3 text-gray-300 py-2.5 px-2 rounded-lg hover:bg-navy-800 text-sm font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          New Post
+        </a>
+        {% if user.is_staff %}
+        <a href="{% url 'cata_add' %}" class="sidebar-link flex items-center gap-3 text-gray-300 py-2.5 px-2 rounded-lg hover:bg-navy-800 text-sm font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10M7 12h10M7 17h10"/></svg>
+          Manage Categories
+        </a>
+        {% else %}
+        <a href="{% url 'my_post' user.id %}" class="sidebar-link flex items-center gap-3 text-gray-300 py-2.5 px-2 rounded-lg hover:bg-navy-800 text-sm font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          My Posts
+        </a>
+        {% endif %}
+      {% endif %}
+      <a href="{% url 'cata_list' %}" class="sidebar-link flex items-center gap-3 text-gray-300 py-2.5 px-2 rounded-lg hover:bg-navy-800 text-sm font-medium">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+        Categories
+      </a>
+    </nav>
+    <div class="px-6 pb-8">
+      {% if user.is_authenticated %}
+        <form action="{% url 'logout' %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="w-full flex items-center gap-3 text-gray-400 hover:text-red-400 py-2.5 px-2 text-sm font-medium transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            Sign Out
+          </button>
+        </form>
+      {% else %}
+        <div class="space-y-2">
+          <a href="{% url 'login' %}" class="block w-full text-center bg-amber-400 hover:bg-amber-500 text-navy-900 font-medium text-sm py-2.5 px-4 rounded-lg transition-colors">Login</a>
+          <a href="{% url 'signup' %}" class="block w-full text-center border border-gray-600 text-gray-300 hover:border-amber-400 hover:text-amber-400 font-medium text-sm py-2.5 px-4 rounded-lg transition-colors">Sign Up</a>
+        </div>
+      {% endif %}
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 md:ml-64">
+    <!-- Header -->
+    <header class="bg-cream-50 border-b border-gray-200 px-8 py-8 sticky top-0 z-10 backdrop-blur-sm bg-opacity-90">
+      <div class="max-w-4xl mx-auto flex items-end justify-between">
+        <div>
+          <p class="text-xs uppercase tracking-widest text-amber-500 font-medium mb-1">Latest</p>
+          <h2 class="font-serif text-3xl font-bold text-navy-900">Blog Posts</h2>
+        </div>
+        <span class="text-sm text-gray-400">{% if posts %}{{ posts|length }} article{% if posts|length != 1 %}s{% endif %}{% endif %}</span>
+      </div>
+    </header>
+
+    <!-- Post Grid -->
+    <div class="max-w-4xl mx-auto px-8 py-10">
+      {% if posts %}
+        <div class="grid gap-6">
+          {% for post in posts %}
+          <article class="post-card bg-white rounded-2xl border border-gray-100 p-7 flex items-start gap-6">
+            <div class="flex-shrink-0 w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="font-serif text-xl font-bold text-navy-900 mb-1 leading-snug">{{ post.title }}</h3>
+              <p class="text-sm text-gray-500 mb-3">by <span class="text-navy-800 font-medium">{{ post.author.username }}</span></p>
+              <a href="{% url 'post_details' post.id %}" class="inline-flex items-center gap-1.5 text-amber-500 hover:text-amber-600 text-sm font-medium transition-colors">
+                Read article
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-24">
+          <div class="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <p class="font-serif text-2xl text-gray-400 mb-2">No posts yet</p>
+          <p class="text-sm text-gray-400">Be the first to share a story.</p>
+        </div>
+      {% endif %}
+    </div>
+  </main>
+
+</body>
+</html>
