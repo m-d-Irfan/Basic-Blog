@@ -3,7 +3,6 @@ from . import views
 from post.views import all_Post
 
 urlpatterns = [
-    path('', all_Post, name="all_Post"),
     path('dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('delete-post/<int:post_id>/', views.admin_delete_post, name='admin_delete_post'),
     path('block-user/<int:user_id>/', views.admin_block_user, name='admin_block_user'),
