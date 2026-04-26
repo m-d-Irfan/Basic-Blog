@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel — The Chronicle</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { serif: ['Playfair Display', 'serif'], sans: ['DM Sans', 'sans-serif'] },
+          colors: {
+            navy: { 900: '#0d1b2a', 800: '#1b2a3b', 700: '#243447', 600: '#2e4460' },
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #f0f2f5; font-family: 'DM Sans', sans-serif; }
+    .stat-card { transition: transform 0.2s; }
+    .stat-card:hover { transform: translateY(-2px); }
+    .table-row { transition: background 0.15s; }
+    .table-row:hover { background: #faf8f4; }
+    /* Tab system */
+    .tab-btn { transition: all 0.2s; }
+    .tab-btn.active { background: #0d1b2a; color: white; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    /* Badge */
+    .badge-active { background: #d1fae5; color: #065f46; }
+    .badge-blocked { background: #fee2e2; color: #991b1b; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- Top navbar -->
+  <header class="bg-navy-900 shadow-lg">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-9 h-9 bg-amber-400 rounded-xl flex items-center justify-center">
+          <svg class="w-5 h-5 text-navy-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="font-serif text-white font-bold text-lg leading-tight">Admin Panel</h1>
+          <p class="text-gray-400 text-xs">The Chronicle</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="text-gray-400 text-sm hidden sm:block">
+          Signed in as <span class="text-amber-400 font-medium">{{ request.user.username }}</span>
+        </span>
+        <a href="/" class="flex items-center gap-1.5 text-gray-400 hover:text-white text-sm transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          Blog
+        </a>
+        <form action="{% url 'logout' %}" method="post" class="inline">
+          {% csrf_token %}
+          <button type="submit" class="flex items-center gap-1.5 text-gray-400 hover:text-red-400 text-sm transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            Logout
+          </button>
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 py-8">
+
+    <!-- Page heading -->
+    <div class="mb-8">
+      <p class="text-xs uppercase tracking-widest text-amber-500 font-medium mb-1">Control Center</p>
+      <h2 class="font-serif text-3xl font-bold text-navy-900">Dashboard</h2>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+      <div class="stat-card bg-white rounded-2xl border border-gray-100 p-6 flex items-center gap-4">
+        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </div>
+        <div>
+          <p class="text-3xl font-bold text-navy-900">{{ total_users }}</p>
+          <p class="text-sm text-gray-500">Total Users</p>
+        </div>
+      </div>
+      <div class="stat-card bg-white rounded-2xl border border-gray-100 p-6 flex items-center gap-4">
+        <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <div>
+          <p class="text-3xl font-bold text-navy-900">{{ total_posts }}</p>
+          <p class="text-sm text-gray-500">Total Posts</p>
+        </div>
+      </div>
+      <div class="stat-card bg-white rounded-2xl border border-gray-100 p-6 flex items-center gap-4">
+        <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+        </div>
+        <div>
+          <p class="text-3xl font-bold text-navy-900">{{ blocked_users }}</p>
+          <p class="text-sm text-gray-500">Blocked Users</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex gap-2 mb-6">
+      <button onclick="switchTab('posts')" id="tab-posts" class="tab-btn active px-5 py-2.5 rounded-xl text-sm font-medium border border-gray-200 text-gray-600">
+        📄 All Posts
+      </button>
+      <button onclick="switchTab('users')" id="tab-users" class="tab-btn px-5 py-2.5 rounded-xl text-sm font-medium border border-gray-200 text-gray-600">
+        👥 All Users
+      </button>
+    </div>
+
+    <!-- POSTS TAB -->
+    <div id="panel-posts" class="tab-panel active">
+      <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h3 class="font-serif text-lg font-bold text-navy-900">Posts</h3>
+          <span class="text-xs text-gray-400">{{ total_posts }} total</span>
+        </div>
+        {% if posts %}
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-gray-50 text-left">
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Title</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Author</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-50">
+                {% for post in posts %}
+                <tr class="table-row">
+                  <td class="px-6 py-4">
+                    <a href="{% url 'post_details' post.id %}" target="_blank" class="font-medium text-navy-900 hover:text-amber-500 transition-colors line-clamp-1">
+                      {{ post.title }}
+                    </a>
+                  </td>
+                  <td class="px-6 py-4 text-gray-500">
+                    {% if post.author %}
+                      <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 bg-navy-900 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span class="text-amber-400 font-bold text-xs">{{ post.author.username|first|upper }}</span>
+                        </div>
+                        {{ post.author.username }}
+                      </div>
+                    {% else %}
+                      <span class="text-gray-300 italic">Deleted user</span>
+                    {% endif %}
+                  </td>
+                  <td class="px-6 py-4 text-gray-500">
+                    {% if post.cata %}<span class="bg-blue-50 text-blue-600 text-xs px-2 py-1 rounded-lg">{{ post.cata.name }}</span>{% else %}<span class="text-gray-300">—</span>{% endif %}
+                  </td>
+                  <td class="px-6 py-4 text-gray-400 text-xs">{{ post.created_at|date:"M j, Y" }}</td>
+                  <td class="px-6 py-4 text-right">
+                    <a href="{% url 'admin_delete_post' post.id %}"
+                       onclick="return confirm('Delete post: {{ post.title|escapejs }}?')"
+                       class="inline-flex items-center gap-1 text-xs text-red-400 hover:text-red-600 border border-red-100 hover:border-red-300 px-3 py-1.5 rounded-lg transition-colors font-medium">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                      Delete
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-20">
+            <p class="font-serif text-xl text-gray-300">No posts yet</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- USERS TAB -->
+    <div id="panel-users" class="tab-panel">
+      <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h3 class="font-serif text-lg font-bold text-navy-900">Users</h3>
+          <span class="text-xs text-gray-400">{{ total_users }} total</span>
+        </div>
+        {% if users %}
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-gray-50 text-left">
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">User</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Joined</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-50">
+                {% for u in users %}
+                <tr class="table-row {% if not u.is_active %}opacity-60{% endif %}">
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 bg-navy-900 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-amber-400 font-bold text-xs">{{ u.username|first|upper }}</span>
+                      </div>
+                      <span class="font-medium text-navy-900">{{ u.username }}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-gray-500">{{ u.email|default:"—" }}</td>
+                  <td class="px-6 py-4 text-gray-400 text-xs">{{ u.date_joined|date:"M j, Y" }}</td>
+                  <td class="px-6 py-4">
+                    {% if u.is_active %}
+                      <span class="badge-active text-xs px-2.5 py-1 rounded-full font-medium">Active</span>
+                    {% else %}
+                      <span class="badge-blocked text-xs px-2.5 py-1 rounded-full font-medium">Blocked</span>
+                    {% endif %}
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <div class="flex items-center justify-end gap-2">
+                      <a href="{% url 'admin_block_user' u.id %}"
+                         onclick="return confirm('{% if u.is_active %}Block{% else %}Unblock{% endif %} user {{ u.username }}?')"
+                         class="inline-flex items-center gap-1 text-xs font-medium border px-3 py-1.5 rounded-lg transition-colors
+                           {% if u.is_active %}text-amber-500 border-amber-200 hover:border-amber-400 hover:text-amber-600
+                           {% else %}text-green-500 border-green-200 hover:border-green-400 hover:text-green-600{% endif %}">
+                        {% if u.is_active %}
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                          Block
+                        {% else %}
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                          Unblock
+                        {% endif %}
+                      </a>
+                      <a href="{% url 'admin_delete_user' u.id %}"
+                         onclick="return confirm('Permanently delete user {{ u.username }} and all their posts?')"
+                         class="inline-flex items-center gap-1 text-xs text-red-400 hover:text-red-600 border border-red-100 hover:border-red-300 px-3 py-1.5 rounded-lg transition-colors font-medium">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        Delete
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-20">
+            <p class="font-serif text-xl text-gray-300">No users yet</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      document.getElementById('panel-' + tab).classList.add('active');
+    }
+  </script>
+
+</body>
+</html>

@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'post',
     'users',
     'catagory',
+    'custom_admin',
 ]
 
 MIDDLEWARE = [
@@ -48,7 +49,7 @@ ROOT_URLCONF = 'blog.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR/'templete'],
+        'DIRS': [BASE_DIR/'template'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

@@ -13,5 +13,6 @@ urlpatterns = [
     path('deletepost/<int:id>', delete_post, name="delete_post"),
     path('mypost/<int:uid>',all_Post , name="my_post"),
     path('users/',include("users.urls")),
-    path('',include("catagory.urls"))
+    path('',include("catagory.urls")),
+    path('panel/', include("custom_admin.urls")),
 ]
