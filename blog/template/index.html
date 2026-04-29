@@ -33,8 +33,18 @@
 </head>
 <body class="font-sans min-h-screen flex">
 
-  <!-- Sidebar -->
-  <aside class="w-64 bg-navy-900 min-h-screen flex flex-col fixed left-0 top-0 z-20 hidden md:flex">
+  <!-- Mobile overlay backdrop -->
+  <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar (desktop: always visible | mobile: slide-in drawer) -->
+  <aside id="sidebar" class="w-64 bg-navy-900 min-h-screen flex flex-col fixed left-0 top-0 z-40
+    -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+
+    <!-- Mobile close button -->
+    <button onclick="closeSidebar()" class="absolute top-4 right-4 text-gray-400 hover:text-white md:hidden">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+
     <div class="px-8 pt-10 pb-6 border-b border-navy-700">
       <h1 class="font-serif text-2xl font-900 text-white leading-tight">The<br><span class="text-amber-400">Chronicle</span></h1>
       <p class="text-xs text-gray-400 mt-2 uppercase tracking-widest">Stories Worth Reading</p>
@@ -45,29 +55,23 @@
           <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Signed in as</p>
           <p class="text-amber-400 font-medium text-sm">{{ user.username }}</p>
         </div>
-        <a href="{% url 'add_post' %}" class="sidebar-link flex items-center gap-3 text-gray-300 py-2.5 px-2 rounded-lg hover:bg-navy-800 text-sm font-medium">
+        <a href="{% url 'add_post' %}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-3 text-gray-300 py-2.5 px-2 rounded-lg hover:bg-navy-800 text-sm font-medium">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
           New Post
         </a>
-        {% if user.is_superuser %}
-        <a href="{% url 'admin_dashboard' %}" class="sidebar-link flex items-center gap-3 text-gray-300 py-2.5 px-2 rounded-lg hover:bg-navy-800 text-sm font-medium">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10M7 12h10M7 17h10"/></svg>
-          Admin Dashboard
-        </a>
-        {% endif %}
         {% if user.is_staff %}
-        <a href="{% url 'cata_add' %}" class="sidebar-link flex items-center gap-3 text-gray-300 py-2.5 px-2 rounded-lg hover:bg-navy-800 text-sm font-medium">
+        <a href="{% url 'cata_add' %}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-3 text-gray-300 py-2.5 px-2 rounded-lg hover:bg-navy-800 text-sm font-medium">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10M7 12h10M7 17h10"/></svg>
           Manage Categories
         </a>
         {% else %}
-        <a href="{% url 'my_post' user.id %}" class="sidebar-link flex items-center gap-3 text-gray-300 py-2.5 px-2 rounded-lg hover:bg-navy-800 text-sm font-medium">
+        <a href="{% url 'my_post' user.id %}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-3 text-gray-300 py-2.5 px-2 rounded-lg hover:bg-navy-800 text-sm font-medium">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
           My Posts
         </a>
         {% endif %}
       {% endif %}
-      <a href="{% url 'cata_list' %}" class="sidebar-link flex items-center gap-3 text-gray-300 py-2.5 px-2 rounded-lg hover:bg-navy-800 text-sm font-medium">
+      <a href="{% url 'cata_list' %}" onclick="closeSidebar()" class="sidebar-link flex items-center gap-3 text-gray-300 py-2.5 px-2 rounded-lg hover:bg-navy-800 text-sm font-medium">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
         Categories
       </a>
@@ -91,20 +95,26 @@
   </aside>
 
   <!-- Main Content -->
-  <main class="flex-1 md:ml-64">
+  <main class="flex-1 md:ml-64 w-full">
     <!-- Header -->
-    <header class="bg-cream-50 border-b border-gray-200 px-8 py-8 sticky top-0 z-10 backdrop-blur-sm bg-opacity-90">
-      <div class="max-w-4xl mx-auto flex items-end justify-between">
-        <div>
-          <p class="text-xs uppercase tracking-widest text-amber-500 font-medium mb-1">Latest</p>
-          <h2 class="font-serif text-3xl font-bold text-navy-900">Blog Posts</h2>
+    <header class="bg-cream-50 border-b border-gray-200 px-4 md:px-8 py-5 md:py-8 sticky top-0 z-10 backdrop-blur-sm bg-opacity-90">
+      <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
+        <!-- Burger button (mobile only) -->
+        <button onclick="openSidebar()" class="md:hidden flex-shrink-0 p-2 -ml-1 rounded-lg text-navy-900 hover:bg-gray-100 transition-colors" aria-label="Open menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <div class="flex-1">
+          <p class="text-xs uppercase tracking-widest text-amber-500 font-medium mb-0.5 md:mb-1">Latest</p>
+          <h2 class="font-serif text-2xl md:text-3xl font-bold text-navy-900">Blog Posts</h2>
         </div>
-        <span class="text-sm text-gray-400">{% if posts %}{{ posts|length }} article{% if posts|length != 1 %}s{% endif %}{% endif %}</span>
+        <span class="text-sm text-gray-400 flex-shrink-0">{% if posts %}{{ posts|length }} article{% if posts|length != 1 %}s{% endif %}{% endif %}</span>
       </div>
     </header>
 
     <!-- Post Grid -->
-    <div class="max-w-4xl mx-auto px-8 py-10">
+    <div class="max-w-4xl mx-auto px-4 md:px-8 py-6 md:py-10">
       {% if posts %}
         <div class="grid gap-6">
           {% for post in posts %}
@@ -135,5 +145,17 @@
     </div>
   </main>
 
+  <script>
+    function openSidebar() {
+      document.getElementById('sidebar').classList.remove('-translate-x-full');
+      document.getElementById('sidebarOverlay').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('sidebarOverlay').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+  </script>
 </body>
 </html>
